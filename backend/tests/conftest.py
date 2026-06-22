@@ -12,9 +12,23 @@ TEST_URL = settings.test_database_url or settings.database_url
 
 @pytest_asyncio.fixture
 async def session() -> AsyncSession:
+    """Async session for tests.
+
+    SECURITY: must connect as a role WITHOUT the BYPASSRLS attribute, or RLS
+    policies are silently skipped and these isolation tests give false positives.
+    The assertion below fails loudly if TEST_DATABASE_URL points at a
+    BYPASSRLS/owner role.
+    """
     engine = create_async_engine(TEST_URL)
     factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     async with factory() as s:
+        bypass = await s.scalar(
+            text("SELECT rolbypassrls FROM pg_roles WHERE rolname = current_user")
+        )
+        assert bypass is False, (
+            "Test DB role bypasses RLS — isolation tests would be meaningless. "
+            "Point TEST_DATABASE_URL at the NOBYPASSRLS app_user role."
+        )
         yield s
     await engine.dispose()
 
