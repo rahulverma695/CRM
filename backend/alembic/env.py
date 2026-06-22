@@ -12,10 +12,12 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
+MIGRATION_URL = settings.migration_database_url or settings.database_url
+
 
 def run_migrations_offline() -> None:
     context.configure(
-        url=settings.database_url, target_metadata=target_metadata,
+        url=MIGRATION_URL, target_metadata=target_metadata,
         literal_binds=True, dialect_opts={"paramstyle": "named"},
     )
     with context.begin_transaction():
@@ -29,7 +31,7 @@ def do_run_migrations(connection) -> None:
 
 
 async def run_migrations_online() -> None:
-    connectable = create_async_engine(settings.database_url)
+    connectable = create_async_engine(MIGRATION_URL)
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
     await connectable.dispose()

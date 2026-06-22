@@ -6,6 +6,7 @@ class Settings(BaseSettings):
 
     database_url: str
     test_database_url: str = ""
+    migration_database_url: str = ""
     jwt_secret: str
     access_token_minutes: int = 30
     refresh_token_days: int = 14
