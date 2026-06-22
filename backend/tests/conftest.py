@@ -3,6 +3,7 @@ import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy import text
+from httpx import AsyncClient, ASGITransport
 from app.config import settings
 from app.core.models import Tenant, User
 from app.core.security.passwords import hash_password
@@ -46,3 +47,23 @@ async def two_tenants(session):
                          name="User", role="admin", password_hash=hash_password("pw")))
         await session.commit()
     return a_id, b_id
+
+
+@pytest_asyncio.fixture
+async def client():
+    from app.main import create_app
+    from app.database import get_session
+
+    app = create_app()
+    test_engine = create_async_engine(TEST_URL)
+    test_factory = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
+
+    async def _override_get_session():
+        async with test_factory() as s:
+            yield s
+
+    app.dependency_overrides[get_session] = _override_get_session
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as c:
+        yield c
+    await test_engine.dispose()
