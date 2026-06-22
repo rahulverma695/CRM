@@ -28,8 +28,14 @@ async def get_tenant_session(
     claims: Annotated[dict, Depends(get_current_claims)],
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> AsyncSession:
-    """Yields a session with RLS tenant context already applied."""
-    await set_tenant(session, claims["tenant_id"])
+    """Return a session with the RLS tenant context already applied.
+
+    Cleanup is handled by get_session's generator dependency.
+    """
+    tenant_id = claims.get("tenant_id")
+    if not tenant_id:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Malformed token: missing tenant_id")
+    await set_tenant(session, tenant_id)
     return session
 
 
