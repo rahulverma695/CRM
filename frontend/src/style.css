@@ -13,6 +13,7 @@
   --muted: #8a958f;
   --accent: #c6f24e;
   --accent-ink: #0a0f0e;
+  --shimmer: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
 }
 
 :root.light {
@@ -25,6 +26,7 @@
   --muted: #5d6b62;
   --accent: #2f9e44;
   --accent-ink: #ffffff;
+  --shimmer: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -52,7 +54,7 @@ h1, h2, h3, .font-display { font-family: "Space Grotesk", sans-serif; }
 .skeleton::after {
   content: ""; position: absolute; inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  background: var(--shimmer);
   animation: shimmer 1.4s infinite;
 }
 
