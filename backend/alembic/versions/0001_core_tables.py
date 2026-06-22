@@ -44,6 +44,7 @@ def upgrade() -> None:
     )
     op.create_index("ix_users_tenant_id", "users", ["tenant_id"])
     op.create_index("ix_users_email", "users", ["email"])
+    op.create_index("ix_users_google_id", "users", ["google_id"])
     op.create_unique_constraint("uq_users_tenant_email", "users", ["tenant_id", "email"])
 
 
