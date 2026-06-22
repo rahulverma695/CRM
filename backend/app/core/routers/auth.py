@@ -15,6 +15,10 @@ from app.database import get_session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+# Precomputed hash used to equalize login timing for unknown/inactive users
+# (prevents user-enumeration via response-time differences).
+_DUMMY_PASSWORD_HASH = hash_password("dummy-password-for-constant-time-login")
+
 
 def _slugify(name: str) -> str:
     base = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "tenant"
@@ -49,9 +53,10 @@ async def login(body: LoginIn, session: Annotated[AsyncSession, Depends(get_sess
         {"email": str(body.email)},
     )
     row = result.first()
-    if row is None or not row.is_active or not row.password_hash:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid credentials")
-    if not verify_password(body.password, row.password_hash):
+    valid_record = row is not None and row.is_active and bool(row.password_hash)
+    hash_to_check = row.password_hash if valid_record else _DUMMY_PASSWORD_HASH
+    password_ok = verify_password(body.password, hash_to_check)
+    if not valid_record or not password_ok:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid credentials")
     return TokenPair(
         access_token=create_access_token(str(row.id), str(row.tenant_id), row.role),
