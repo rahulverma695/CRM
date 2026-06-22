@@ -6,7 +6,7 @@
     "strict": true,
     "jsx": "preserve",
     "lib": ["ESNext", "DOM"],
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "vite/client"],
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] },
     "skipLibCheck": true
