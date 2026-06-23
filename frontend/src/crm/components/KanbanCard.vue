@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from "vue-router";
 import type { Lead } from "@/crm/api";
 
 const props = defineProps<{
@@ -12,8 +13,9 @@ const initials = (lead: Lead) => {
 </script>
 
 <template>
-  <div
-    class="kanban-card group"
+  <RouterLink
+    :to="`/crm/leads/${lead.id}`"
+    class="kanban-card group block no-underline"
     :class="{ 'is-dragging': isDragging }"
   >
     <!-- Company badge -->
@@ -46,7 +48,7 @@ const initials = (lead: Lead) => {
         {{ initials(lead) }}
       </div>
     </div>
-  </div>
+  </RouterLink>
 </template>
 
 <style scoped>
