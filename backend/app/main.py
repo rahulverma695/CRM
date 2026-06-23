@@ -19,6 +19,16 @@ def create_app() -> FastAPI:
     app.include_router(invites.router)
     app.include_router(oauth.router)
 
+    from app.crm.routers import stages, leads, deals, activities, crm_tasks, custom_views
+    from app.crm.routers import ws as crm_ws
+    app.include_router(stages.router)
+    app.include_router(leads.router)
+    app.include_router(deals.router)
+    app.include_router(activities.router)
+    app.include_router(crm_tasks.router)
+    app.include_router(custom_views.router)
+    app.include_router(crm_ws.router)
+
     @app.get("/health")
     async def health():
         return {"status": "ok"}

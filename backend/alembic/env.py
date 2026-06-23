@@ -5,6 +5,7 @@ from alembic import context
 from app.config import settings
 from app.core.models import Base
 import app.core.models  # noqa: F401  ensures all models are imported
+import app.crm.models   # noqa: F401  registers CRM models with Base.metadata
 
 config = context.config
 if config.config_file_name is not None:
@@ -12,7 +13,12 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
-MIGRATION_URL = settings.migration_database_url or settings.database_url
+import os as _os
+MIGRATION_URL = (
+    _os.environ.get("MIGRATION_DATABASE_URL")
+    or settings.migration_database_url
+    or settings.database_url
+)
 
 
 def run_migrations_offline() -> None:

@@ -41,9 +41,7 @@ async def test_non_owner_cannot_edit_view(client, tenant_and_admin, session):
     session.add(view)
     await session.commit()
 
-    other_token = create_access_token(
-        {"sub": str(other_user.id), "tenant_id": str(tenant.id), "role": "member"}
-    )
+    other_token = create_access_token(str(other_user.id), str(tenant.id), "member")
     resp = await client.patch(
         f"/crm/views/{view.id}",
         json={"name": "Hacked"},

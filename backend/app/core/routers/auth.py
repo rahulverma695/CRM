@@ -6,12 +6,29 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import JWTError
 from app.core.models import Tenant, User
+from app.crm.models import PipelineStage
 from app.core.schemas.auth import SignupIn, LoginIn, TokenPair, UserOut, RefreshIn
 from app.core.security.passwords import hash_password, verify_password
 from app.core.security.jwt import create_access_token, create_refresh_token, decode_token
 from app.core.middleware.tenant_context import set_tenant
 from app.core.deps import get_current_claims, get_tenant_session
 from app.database import get_session
+
+async def _seed_default_stages(session, tenant_id) -> None:
+    import uuid as _uuid
+    defaults = [
+        ("New Lead",  "#6b7280", 0),
+        ("Contacted", "#3b82f6", 1),
+        ("Qualified", "#8b5cf6", 2),
+        ("Proposal",  "#f59e0b", 3),
+        ("Won",       "#c6f24e", 4),
+    ]
+    for name, color, order in defaults:
+        session.add(PipelineStage(
+            id=_uuid.uuid4(), tenant_id=tenant_id,
+            name=name, color=color, order=order, type="lead",
+        ))
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -32,6 +49,7 @@ async def signup(body: SignupIn, session: Annotated[AsyncSession, Depends(get_se
     await session.flush()
 
     await set_tenant(session, str(tenant.id))
+    await _seed_default_stages(session, tenant.id)
     user = User(
         id=uuid.uuid4(), tenant_id=tenant.id, email=str(body.email),
         name=body.name, role="admin", password_hash=hash_password(body.password),

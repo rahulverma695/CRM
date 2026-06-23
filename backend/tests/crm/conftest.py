@@ -33,9 +33,7 @@ async def tenant_and_admin(session):
     session.add(user)
     await session.commit()
 
-    token = create_access_token(
-        {"sub": str(user.id), "tenant_id": str(tenant.id), "role": "admin"}
-    )
+    token = create_access_token(str(user.id), str(tenant.id), "admin")
     headers = {"Authorization": f"Bearer {token}"}
     return tenant, user, headers
 
