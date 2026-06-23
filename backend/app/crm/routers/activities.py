@@ -52,8 +52,10 @@ async def create_activity(
     if ws_manager is not None:
         await ws_manager.broadcast(
             f"kanban:{claims['tenant_id']}",
-            {"event": "activity_added", "lead_id": str(body.lead_id),
-             "deal_id": str(body.deal_id), "type": body.type},
+            {"event": "activity_added",
+             "lead_id": str(body.lead_id) if body.lead_id else None,
+             "deal_id": str(body.deal_id) if body.deal_id else None,
+             "type": body.type},
         )
 
     return activity
