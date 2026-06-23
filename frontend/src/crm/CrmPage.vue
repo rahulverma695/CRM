@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref, reactive } from "vue";
+import { onMounted, onUnmounted, ref, reactive } from "vue";
 import KanbanBoard from "@/crm/components/KanbanBoard.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseInput from "@/components/BaseInput.vue";
 import { usePipelineStore } from "@/crm/stores/pipeline";
 import { useLeadsStore } from "@/crm/stores/leads";
+import { useAuthStore } from "@/core/stores/auth";
+import { createKanbanSocket, type TenantSocket } from "@/core/ws";
 
 const pipeline = usePipelineStore();
 const leadsStore = useLeadsStore();
+const auth = useAuthStore();
+
+let socket: TenantSocket | null = null;
 
 const showNewLead = ref(false);
 const creating = ref(false);
@@ -27,6 +32,25 @@ onMounted(async () => {
   if (!newLead.stage_id && pipeline.leadStages.length) {
     newLead.stage_id = pipeline.leadStages[0].id;
   }
+
+  if (auth.accessToken) {
+    socket = createKanbanSocket(auth.accessToken);
+    socket.on((msg) => {
+      const ev = msg as Record<string, unknown>;
+      if (ev.event === "lead_moved") {
+        const existing = leadsStore.leads.find((l) => l.id === ev.lead_id);
+        if (existing) {
+          leadsStore.patchLeadLocally({ ...existing, stage_id: ev.stage_id as string | null });
+        }
+      }
+    });
+    socket.connect();
+  }
+});
+
+onUnmounted(() => {
+  socket?.disconnect();
+  socket = null;
 });
 
 async function createLead() {
