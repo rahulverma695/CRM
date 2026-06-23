@@ -34,6 +34,11 @@ async def create_invite(
     sender: Annotated[EmailSender, Depends(get_email_sender)],
 ):
     tenant_id = admin["tenant_id"]
+    existing = (await session.execute(
+        select(User).where(User.email == str(body.email))
+    )).scalar_one_or_none()
+    if existing is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "A user with this email already exists")
     user = User(
         id=uuid.uuid4(), tenant_id=uuid.UUID(tenant_id), email=str(body.email),
         name=body.name, role=body.role, is_active=False, password_hash=None,
@@ -68,6 +73,8 @@ async def accept_invite(
     )).scalar_one_or_none()
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Invite target missing")
+    if user.is_active:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Invite already accepted")
     user.password_hash = hash_password(body.password)
     user.is_active = True
     await session.commit()

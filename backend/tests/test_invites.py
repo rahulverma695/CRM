@@ -54,3 +54,27 @@ async def test_accept_invite_activates_and_logs_in(client, admin_token):
         "email": "grandpa@wonka.com", "password": "joesecret1",
     })
     assert login.status_code == 200
+
+
+async def test_duplicate_invite_returns_409(client, admin_token):
+    email_sender.sent.clear()
+    first = await client.post("/invites", json={
+        "email": "dup@wonka.com", "name": "Dup", "role": "member",
+    }, headers={"Authorization": f"Bearer {admin_token}"})
+    assert first.status_code == 201
+    second = await client.post("/invites", json={
+        "email": "dup@wonka.com", "name": "Dup Again", "role": "member",
+    }, headers={"Authorization": f"Bearer {admin_token}"})
+    assert second.status_code == 409
+
+
+async def test_accept_invite_twice_is_rejected(client, admin_token):
+    email_sender.sent.clear()
+    await client.post("/invites", json={
+        "email": "twice@wonka.com", "name": "Twice", "role": "member",
+    }, headers={"Authorization": f"Bearer {admin_token}"})
+    token = email_sender.sent[0]["body"].split("token=")[1].strip()
+    first = await client.post("/invites/accept", json={"token": token, "password": "secret123"})
+    assert first.status_code == 200
+    second = await client.post("/invites/accept", json={"token": token, "password": "newsecret123"})
+    assert second.status_code == 409
