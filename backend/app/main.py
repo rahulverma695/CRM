@@ -10,7 +10,7 @@ def create_app() -> FastAPI:
     app.add_middleware(SessionMiddleware, secret_key=settings.session_secret or settings.jwt_secret)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[settings.frontend_url],
+        allow_origins=settings.cors_origin_list,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
