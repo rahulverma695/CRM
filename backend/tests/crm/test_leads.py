@@ -54,9 +54,7 @@ async def test_update_lead_stage_creates_activity(client, tenant_and_admin, lead
 
 async def test_leads_rls_cross_tenant(client, tenant_and_admin, lead):
     """A second tenant's token cannot see the first tenant's leads."""
-    other_token = create_access_token(
-        {"sub": str(uuid.uuid4()), "tenant_id": str(uuid.uuid4()), "role": "member"}
-    )
+    other_token = create_access_token(str(uuid.uuid4()), str(uuid.uuid4()), "member")
     other_headers = {"Authorization": f"Bearer {other_token}"}
     resp = await client.get("/crm/leads", headers=other_headers)
     assert resp.status_code == 200

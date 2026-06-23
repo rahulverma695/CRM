@@ -46,8 +46,9 @@ async def create_activity(
         **body.model_dump(),
     )
     session.add(activity)
-    await session.commit()
+    await session.flush()
     await session.refresh(activity)
+    await session.commit()
 
     if ws_manager is not None:
         await ws_manager.broadcast(

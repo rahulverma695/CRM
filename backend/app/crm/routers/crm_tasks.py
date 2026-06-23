@@ -38,8 +38,9 @@ async def create_task(
         **body.model_dump(),
     )
     session.add(task)
-    await session.commit()
+    await session.flush()
     await session.refresh(task)
+    await session.commit()
     return task
 
 
@@ -55,8 +56,9 @@ async def update_task(
         raise HTTPException(404)
     for field, value in body.model_dump(exclude_none=True).items():
         setattr(task, field, value)
-    await session.commit()
+    await session.flush()
     await session.refresh(task)
+    await session.commit()
     return task
 
 

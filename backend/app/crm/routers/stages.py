@@ -33,8 +33,9 @@ async def create_stage(
         **body.model_dump(),
     )
     session.add(stage)
-    await session.commit()
+    await session.flush()
     await session.refresh(stage)
+    await session.commit()
     return stage
 
 
@@ -50,8 +51,9 @@ async def update_stage(
         raise HTTPException(404)
     for field, value in body.model_dump(exclude_none=True).items():
         setattr(stage, field, value)
-    await session.commit()
+    await session.flush()
     await session.refresh(stage)
+    await session.commit()
     return stage
 
 

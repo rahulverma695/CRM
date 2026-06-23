@@ -55,8 +55,9 @@ async def create_lead(
         **body.model_dump(),
     )
     session.add(lead)
-    await session.commit()
+    await session.flush()
     await session.refresh(lead)
+    await session.commit()
     return lead
 
 
@@ -89,8 +90,9 @@ async def update_lead(
         )
         session.add(activity)
 
-    await session.commit()
+    await session.flush()
     await session.refresh(lead)
+    await session.commit()
 
     # broadcast Kanban move
     if "stage_id" in updates and ws_manager is not None:

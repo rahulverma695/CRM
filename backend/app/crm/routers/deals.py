@@ -50,8 +50,9 @@ async def create_deal(
         **body.model_dump(),
     )
     session.add(deal)
-    await session.commit()
+    await session.flush()
     await session.refresh(deal)
+    await session.commit()
     return deal
 
 
@@ -67,8 +68,9 @@ async def update_deal(
         raise HTTPException(404)
     for field, value in body.model_dump(exclude_none=True).items():
         setattr(deal, field, value)
-    await session.commit()
+    await session.flush()
     await session.refresh(deal)
+    await session.commit()
     return deal
 
 

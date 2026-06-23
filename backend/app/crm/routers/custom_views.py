@@ -37,8 +37,9 @@ async def create_view(
         **body.model_dump(),
     )
     session.add(view)
-    await session.commit()
+    await session.flush()
     await session.refresh(view)
+    await session.commit()
     return view
 
 
@@ -56,8 +57,9 @@ async def update_view(
         raise HTTPException(403, "Only the view owner can edit it")
     for field, value in body.model_dump(exclude_none=True).items():
         setattr(view, field, value)
-    await session.commit()
+    await session.flush()
     await session.refresh(view)
+    await session.commit()
     return view
 
 
