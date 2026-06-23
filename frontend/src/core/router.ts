@@ -12,6 +12,8 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
     children: [
       { path: "", name: "dashboard", component: () => import("@/pages/DashboardPage.vue") },
+      { path: "crm", name: "crm", component: () => import("@/crm/CrmPage.vue") },
+      { path: "crm/leads/:id", name: "lead-detail", component: () => import("@/crm/LeadDetailPage.vue") },
     ],
   },
 ];

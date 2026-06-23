@@ -28,7 +28,9 @@ function logout() {
           Dashboard
         </RouterLink>
         <div class="mt-4 mb-1 text-xs uppercase tracking-wider text-muted px-3">CRM</div>
-        <span class="rounded-lg px-3 py-2 text-muted cursor-not-allowed">Pipeline (Phase 1)</span>
+        <RouterLink to="/crm" class="rounded-lg px-3 py-2 hover:bg-surface-raised" active-class="bg-surface-raised text-accent">
+          Pipeline
+        </RouterLink>
         <div class="mt-4 mb-1 text-xs uppercase tracking-wider text-muted px-3">HR</div>
         <span class="rounded-lg px-3 py-2 text-muted cursor-not-allowed">Employees (Phase 2)</span>
       </nav>
