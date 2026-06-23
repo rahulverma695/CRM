@@ -7,7 +7,7 @@ from app.core.routers import auth, invites, oauth
 
 def create_app() -> FastAPI:
     app = FastAPI(title="CRM + HR Platform")
-    app.add_middleware(SessionMiddleware, secret_key=settings.jwt_secret)
+    app.add_middleware(SessionMiddleware, secret_key=settings.session_secret or settings.jwt_secret)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[settings.frontend_url],

@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     test_database_url: str = ""
     migration_database_url: str = ""
     jwt_secret: str
+    session_secret: str = ""
     access_token_minutes: int = 30
     refresh_token_days: int = 14
     google_client_id: str = ""
