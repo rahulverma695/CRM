@@ -34,6 +34,10 @@ export const useAuthStore = defineStore("auth", {
     async fetchMe() {
       this.user = await api<User>("/auth/me", { token: this.accessToken });
     },
+    async acceptInvite(token: string, password: string) {
+      this.setTokens(await api<TokenPair>("/invites/accept", { method: "POST", body: { token, password } }));
+      await this.fetchMe();
+    },
     logout() {
       this.accessToken = null;
       this.refreshToken = null;

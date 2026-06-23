@@ -4,6 +4,8 @@ import { useAuthStore } from "@/core/stores/auth";
 const routes: RouteRecordRaw[] = [
   { path: "/login", name: "login", component: () => import("@/pages/LoginPage.vue") },
   { path: "/signup", name: "signup", component: () => import("@/pages/SignupPage.vue") },
+  { path: "/auth/callback", name: "auth-callback", component: () => import("@/pages/LoginCallbackPage.vue") },
+  { path: "/accept-invite", name: "accept-invite", component: () => import("@/pages/AcceptInvitePage.vue") },
   {
     path: "/",
     component: () => import("@/layouts/AppShell.vue"),
