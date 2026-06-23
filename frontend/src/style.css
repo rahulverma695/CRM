@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Midnight Signal — dark (default) */
+  --canvas: #0a0f0e;
+  --canvas-2: #1b2e2a;
+  --surface: #101714;
+  --surface-raised: #16201c;
+  --border: #243029;
+  --ink: #f4f6f4;
+  --muted: #8a958f;
+  --accent: #c6f24e;
+  --accent-ink: #0a0f0e;
+  --shimmer: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+
+:root.light {
+  --canvas: #f3f6f2;
+  --canvas-2: #e7efe6;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --border: #d8e2d6;
+  --ink: #14211c;
+  --muted: #5d6b62;
+  --accent: #2f9e44;
+  --accent-ink: #ffffff;
+  --shimmer: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+html, body, #app { min-height: 100dvh; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(120% 90% at 0% 0%, var(--canvas-2) 0%, var(--canvas) 55%, var(--canvas) 100%);
+  color: var(--ink);
+  font-family: "Outfit", sans-serif;
+}
+
+h1, h2, h3, .font-display { font-family: "Space Grotesk", sans-serif; }
+
+/* Skeleton shimmer */
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+.skeleton {
+  position: relative; overflow: hidden;
+  background: var(--surface-raised); border-radius: 0.5rem;
+}
+.skeleton::after {
+  content: ""; position: absolute; inset: 0;
+  transform: translateX(-100%);
+  background: var(--shimmer);
+  animation: shimmer 1.4s infinite;
+}
+
+/* Staggered reveal */
+@keyframes riseIn { to { opacity: 1; transform: translateY(0); } }
+.stagger-item {
+  opacity: 0; transform: translateY(14px);
+  animation: riseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
