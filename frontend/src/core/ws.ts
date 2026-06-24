@@ -7,17 +7,24 @@ export class TenantSocket {
   private handlers = new Set<MessageHandler>();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private shouldReconnect = true;
+  private retries = 0;
+  private readonly maxRetries: number;
   private token: string;
   private path: string;
 
-  constructor(path: string, token: string) {
+  constructor(path: string, token: string, maxRetries = 5) {
     this.path = path;
     this.token = token;
+    this.maxRetries = maxRetries;
   }
 
   connect() {
     const url = `${WS_BASE}${this.path}?token=${encodeURIComponent(this.token)}`;
     this.ws = new WebSocket(url);
+
+    this.ws.onopen = () => {
+      this.retries = 0;
+    };
 
     this.ws.onmessage = (ev) => {
       try {
@@ -29,7 +36,8 @@ export class TenantSocket {
     };
 
     this.ws.onclose = () => {
-      if (this.shouldReconnect) {
+      if (this.shouldReconnect && this.retries < this.maxRetries) {
+        this.retries++;
         this.reconnectTimer = setTimeout(() => this.connect(), 3000);
       }
     };
